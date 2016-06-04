@@ -1,18 +1,15 @@
 from app import app
+from app import SocketIO
 from app.bot.models import Bot
-from flask import request, jsonify
+from flask import request, jsonify, render_template
 import json
+from flask_socketio import emit
 
-@app.route("/bot/<auth_token>/webhook/", methods=['POST'])
-def bot_webhook(auth_token):
-    if request.method == 'POST':
-        print(request.data)
-        return json.dumps(True)
-    
+ 
 @app.route("/bot/<auth_token>/add/", methods=['GET'])
 def bot_add(auth_token):
     new_bot = Bot(auth_token)
-    response = new_bot.set_webhook(app.DOMAIN + '/bot/webhook/' + auth_token)
+    response = new_bot.set_webhook(app.DOMAIN + '/bot/' + auth_token + '/webhook/')
     return jsonify(response)
 
 @app.route("/bot/<auth_token>/remove/", methods=['GET'])
@@ -26,6 +23,28 @@ def bot_get(auth_token):
     new_bot = Bot(auth_token)
     response = new_bot.get_me()
     return jsonify(response)
+        
+@app.route("/bot/<auth_token>/updates/", methods=['GET', 'POST'])
+def bot_get_updates(auth_token):
+    if request.method == 'POST':
+        new_bot = Bot(auth_token)
+        response = new_bot.get_updates(request.json['offset'], request.json['limit'], request.json['timeout'])
+        return str(response)
+    else:
+        new_bot = Bot(auth_token)
+        response = new_bot.get_updates(request.args.get('offset', ''), request.args.get('limit', ''), request.args.get('timeout', ''))
+        return jsonify(response)
+
+@app.route("/bot/<auth_token>/realtime-updates/", methods=['GET'])
+def bot_get_realtime_updates(auth_token):
+    return render_template('bot_realtime_updates.html')
+
+@app.route("/bot/<auth_token>/webhook/", methods=['POST'])
+def bot_webhook(auth_token):
+    if request.method == 'POST':
+        print(request.data)
+        emit('my response', {'data': request.data})
+        return json.dumps(True)
 
 @app.route("/bot/<auth_token>/send/", methods=['GET', 'POST'])
 def bot_send_message(auth_token):
@@ -36,15 +55,4 @@ def bot_send_message(auth_token):
     else:
         new_bot = Bot(auth_token)
         response = new_bot.send_message(request.args.get('channel', ''), request.args.get('text', ''), request.args.get('parse', ''))
-        return jsonify(response)
-        
-@app.route("/bot/<auth_token>/updates/", methods=['GET', 'POST'])
-def bot_get_update(auth_token):
-    if request.method == 'POST':
-        new_bot = Bot(auth_token)
-        response = new_bot.get_updates(request.json['offset'], request.json['limit'], request.json['timeout'])
-        return str(response)
-    else:
-        new_bot = Bot(auth_token)
-        response = new_bot.get_updates(request.args.get('offset', ''), request.args.get('limit', ''), request.args.get('timeout', ''))
         return jsonify(response)
