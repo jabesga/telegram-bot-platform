@@ -1,9 +1,7 @@
 import requests
 
 class Bot():
-    """
-    Create a bot and manage it
-    """
+
     token = None
              
     def __init__(self, token):
@@ -18,23 +16,10 @@ class Bot():
         return r.json()
         
     def get_me(self):
-        """
-        Get bot information
-        """
         response = self.make_query('getMe')
         return response
 
     def get_updates(self, offset, limit=100, timeout=0):
-        """This function does something.
-
-        :param name: The name to use.
-        :type name: str.
-        :param state: Current state to be in.
-        :type state: bool.
-        :returns:  int -- the return code.
-        :raises: AttributeError, KeyError
-
-        """
         response = self.make_query('getUpdates', {'offset': offset, 'limit': limit, 'timeout': timeout})
         return response
 
