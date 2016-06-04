@@ -7,6 +7,9 @@ from flask_socketio import emit
  
 @app.route("/bot/<auth_token>/", methods=['GET'])
 def bot_get(auth_token):
+    """
+    Get info of bot
+    """
     new_bot = Bot(auth_token)
     response = new_bot.get_me()
     return jsonify(response)
