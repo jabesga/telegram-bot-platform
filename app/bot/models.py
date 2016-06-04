@@ -28,6 +28,10 @@ class Bot():
         response = self.make_query('setWebhook')
         return response
         
-    def send_message(self, chat_id, text=None, parse_mode=None):
-        response = self.make_query('sendMessage', {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode})
+    def send_message(self, chat_id, text=None, parse_mode=None, disable_web_page_preview=None, disable_notification=None, reply_to_message_id=None, reply_markup=None):
+        response = self.make_query('sendMessage', {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode, 'disable_notification': disable_notification, 'reply_to_message_id': reply_to_message_id, 'reply_markup': reply_markup})
+        return response
+        
+    def forward_message(self, chat_id, from_chat_id, message_id, disable_notification=False):
+        response = self.make_query('forwardMessage', {'chat_id': chat_id, 'from_chat_id': from_chat_id, 'disable_notification': disable_notification, 'message_id': message_id})
         return response
